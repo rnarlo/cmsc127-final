@@ -42,3 +42,5 @@ CREATE TABLE IF NOT EXISTS `user_task` (
     CONSTRAINT `user_task_taskid_fk` 
         FOREIGN KEY (`taskid`) REFERENCES `task` (`taskid`)
 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+INSERT INTO category VALUES ('acads', CURDATE());
