@@ -15,7 +15,19 @@ def runSql(file):
 
 app.clearTerminal()
 
-cursor = app.databaseLogin()
+password = input('\nEnter MariaDB root password: ') # Get user input for MariaDB root password.
+
+try:
+    mariadb_connection = mariadb.connect(user='root', password=password, host='localhost', port='3306')
+except mariadb.Error as err:
+    if err.errno == 1698:
+        print("\nIncorrect root password.\n")
+        exit()
+    else:
+        print(err)
+        exit()
+
+cursor = mariadb_connection.cursor()
 
 filename = 'data.sql'
 runSql(filename)
