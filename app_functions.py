@@ -1,5 +1,4 @@
 import os
-from queue import Empty
 import random
 import mysql.connector as mariadb
 from datetime import datetime
