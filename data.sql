@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `category` (
 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `task` (
-    taskid          VARCHAR(20) NOT NULL,
+    taskid          VARCHAR(10) NOT NULL,
     taskdescription VARCHAR(30) NOT NULL,
     dategiven       DATE        NOT NULL,
     datestarted     DATE        NULL,
@@ -44,3 +44,4 @@ CREATE TABLE IF NOT EXISTS `user_task` (
 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO category VALUES ('acads', CURDATE());
+INSERT INTO category VALUES ('test', CURDATE());

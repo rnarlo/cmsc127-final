@@ -3,7 +3,7 @@ import app_functions as app
 
 app.clearTerminal()
 mariadb_connection = app.databaseLogin()
-cursor = mariadb_connection.cursor()
+cursor = mariadb_connection.cursor(buffered=True)
 app.clearTerminal()
 
 sep = '========================='
@@ -19,6 +19,7 @@ while(1):
         app.addTask(cursor)
         mariadb_connection.commit()
     elif input1 == '11':
+        cursor.close()
         print('\nHave a good day!\n')
         exit()
     else:

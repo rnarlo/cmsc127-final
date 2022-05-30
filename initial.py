@@ -31,5 +31,6 @@ cursor = mariadb_connection.cursor()
 
 filename = 'data.sql'
 runSql(filename)
+mariadb_connection.commit()
 cursor.close()
 print('\nDatabase has been sourced from', filename, 'file\nYou may now run the main app.\n')
