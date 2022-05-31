@@ -20,11 +20,10 @@ Written and presented by:
 
 <hr>
 
-1. Install MySQL Connector using:
+1. Install MySQL Connector using either of the following:
    ```
    pip install mysql-connector
    ```
-   or
    ```
    pip3 install mysql-connector
    ```
