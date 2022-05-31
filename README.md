@@ -5,7 +5,9 @@
 # CMSC 127 Final Project
 
 <p>
-This is a task-listing Python CLI application that makes use of an SQL database.
+This is a task-listing CLI application that makes use of an SQL database.
+<br>
+Submitted in fulfillment of the final project in CMSC 127 - File Processing and Database Systems.
 <br><br>
 Written and presented by:
 <ul>
