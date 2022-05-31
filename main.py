@@ -18,6 +18,10 @@ while(1):
     if input1 == '1':
         app.addTask(cursor)
         mariadb_connection.commit()
+    elif input1 == '4':
+        app.viewTasks(cursor)
+        input1 = input('\nIf you are done viewing your tasks, press Enter.\n')
+        app.clearTerminal()
     elif input1 == '11':
         cursor.close()
         print('\nHave a good day!\n')

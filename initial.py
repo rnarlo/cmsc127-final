@@ -15,7 +15,7 @@ def runSql(file):
 
 app.clearTerminal()
 
-password = input('\nEnter MariaDB root password: ') # Get user input for MariaDB root password.
+password = input('Enter MariaDB root password: ') # Get user input for MariaDB root password.
 
 try:
     mariadb_connection = mariadb.connect(user='root', password=password, host='localhost', port='3306')
@@ -27,7 +27,22 @@ except mariadb.Error as err:
         print(err)
         exit()
 
-cursor = mariadb_connection.cursor()
+cursor = mariadb_connection.cursor(buffered=True)
+
+cursor.execute('SHOW DATABASES')
+
+for database in cursor:
+    if 'app_data' in database:
+        print("\nThe 'app_data' database has already been initialized. Doing so again will wipe all of the data in it. Continue? (Y/N)")
+        input1 = input('Input: ')
+
+        if input1 == 'N' or input1 == 'n':
+            exit()
+        if input1 == 'Y' or input1 == 'y':
+            break
+        else:
+            print('\nInvalid input!\n')
+            exit()
 
 filename = 'data.sql'
 runSql(filename)

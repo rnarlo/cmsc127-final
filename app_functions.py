@@ -62,7 +62,7 @@ def inputTask():                                                                
 
 def inputDeadline():                                                            # Function for asking user input for task deadline
     format = "%Y-%m-%d"                                                         # Date format is yyyy-mm-dd
-    yesterday = datetime.now() - timedelta(days = 1)                          # Date today
+    yesterday = datetime.now() - timedelta(days = 1)                            # Date yesterday
     while(1):                                                                   
         deadline = input("\nAdd deadline (Leave blank if none, format is yyyy-mm-dd): ")
 
@@ -123,3 +123,19 @@ def addTask(cursor):                                                            
     print("Executed", statement+";")
     return cursor.execute(statement)
 
+def viewTasks(cursor):
+    clearTerminal()
+    print('TASKS:\n')
+    cursor.execute('SELECT * from task')
+    for task in cursor:
+        print('Task ID:',task[0])
+        print('Description:',task[1])
+        print('Date Added:',task[2])
+        print('Date Started:',task[3])
+        print('Date Finished:',task[4])
+        print('Deadline:',task[5])
+        if task[6] == 0:
+            print('Status: Not finished')
+        else:
+            print('Status: Finished')
+        print('Category:',task[7],end='\n-------------------------\n')
