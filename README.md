@@ -24,6 +24,10 @@ Written and presented by:
    ```
    pip install mysql-connector
    ```
+   or
+   ```
+   pip3 install mysql-connector
+   ```
 2. Clone this repository:
    ```
    git clone https://github.com/rnarlo/cmsc127-final
@@ -31,7 +35,7 @@ Written and presented by:
 3. `cd` into the directory.
 
 
-4. Run 'initial.py' ONCE
+4. Run 'initial.py' `ONCE`
    ```
    python3 initial.py
    ```
