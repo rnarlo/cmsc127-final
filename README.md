@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/dependencies-mysql--connector--python-green">
+<img src="https://img.shields.io/badge/dependencies-mysql--connector--python-green"> <img src="https://img.shields.io/badge/CMSC-127-lightgrey"> <img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white">
 
 # CMSC 127 Final Project
 
