@@ -139,3 +139,60 @@ def viewTasks(cursor):
         else:
             print('Status: Finished')
         print('Category:',task[7],end='\n-------------------------\n')
+
+def inputCategoryName(cursor):
+    while(1):                                                                   # Infinite loop
+        categoryName = input("\nEnter category name: ")
+        cursor.execute('SELECT categoryname FROM category')
+        exists = False
+        for category in cursor:                                                 # If category exists,
+            if categoryName in category:  
+                exists = True
+                break         
+        
+        if exists:
+            print("Category already exist!")   
+        else:
+            return "'"+categoryName+"'"                      
+
+def addCategory(cursor):                                                            # Function for adding a task to the database
+    clearTerminal()
+
+    categoryName = inputCategoryName(cursor)
+    dateCreated = 'CURDATE()'
+
+    clearTerminal()
+
+    statement = "INSERT INTO category VALUES ("+categoryName+", "+dateCreated+")"
+    print("Executed", statement+";")
+    return cursor.execute(statement)
+
+def deleteCategory(cursor):
+    clearTerminal()
+    while(1):
+        exists = False
+        delete = input('\nEnter category name to be deleted: ')
+
+        cursor.execute('SELECT * from category')
+        for category in cursor:
+            if delete in category:
+                exists = True
+                break
+            else:
+                exists = False
+
+        if not exists:
+            print("Category name does not exist!")
+        else:
+            clearTerminal()
+            statement = "DELETE FROM category WHERE categoryname = '"+delete+"'"
+            print("Executed", statement+";")
+            return cursor.execute(statement)
+
+def viewCategory(cursor):
+    clearTerminal()
+    print('CATEGORY:\n')
+    cursor.execute('SELECT * from category')
+    for category in cursor:
+        print('Category Name:',category[0])
+        print('Date Created:',category[1],end='\n-------------------------\n')

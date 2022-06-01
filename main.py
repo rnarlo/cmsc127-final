@@ -22,6 +22,16 @@ while(1):
         app.viewTasks(cursor)
         input1 = input('\nIf you are done viewing your tasks, press Enter.\n')
         app.clearTerminal()
+    elif input1 == '6':
+        app.addCategory(cursor)
+        mariadb_connection.commit()
+    elif input1 == '8':
+        app.deleteCategory(cursor)
+        mariadb_connection.commit()
+    elif input1 == '9':
+        app.viewCategory(cursor) 
+        input1 = input('\nIf you are done viewing the category, press Enter.\n')
+        app.clearTerminal()
     elif input1 == '11':
         cursor.close()
         print('\nHave a good day!\n')
