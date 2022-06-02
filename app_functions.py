@@ -26,12 +26,12 @@ def printMenu():    # Function for printing main menu where the user can choose 
     print()
     count = 1
     menuItems = ['Create a New Task', 'Edit an Existing Task', 'Delete a Task', 'View All Tasks', 'Mark a Task As Done', 
-                'Create a New Category', 'Edit a Category', 'Delete a Category', 'View a Category', 'Add a Task To Category', 'Exit App']
+                'Create a New Category', 'Edit a Category', 'Delete a Category', 'View a Category', 'Exit App']
     for item in menuItems:
-        print ('{}. '.format(count),item)
+        print ('{}.'.format(count),item)
         count += 1
     
-    input1 = input('\nInput (1-11): ')
+    input1 = input('\nInput (1-10): ')
     return input1
 
 def generateTaskId(cursor):                                                     # Function for generating a unique task ID that's 10 characters long
@@ -47,18 +47,23 @@ def generateTaskId(cursor):                                                     
             return "'"+taskId+"'"
 
         cursor.execute('SELECT taskid FROM task')      
-        for taskId1 in cursor:                                                  # If taskId already exists in tasks,
+        for taskId1 in cursor:                                                  # If taskId already exists in tasks,  ### I would like to note this is **extremely** unlikely to happen. But it's always good to make sure!
             if taskId not in taskId1:                                           # Generate another one, else print and return
-                print("\nTask ID:",taskId)
+                print("\nTask ID:",taskId)                                      
                 return "'"+taskId+"'"
 
 def inputTask():                                                                # Function for asking user input for their task description
     while(1):                                                                   # Infinite loop
-        task = input("\nAdd task description: ")                                # User input
-        if len(task) > 30:                                                      # If task description is longer than 30 characters, ask for input again.
-            print('Task cannot be longer than 30 characters. Try again.')
-        else:
-            return "'"+task+"'"                                                 # Else return it
+        try:
+            task = input("\nAdd task description: ")                            # User input
+            if len(task) > 30:                                                  # If task description is longer than 30 characters, ask for input again.
+                print('Task cannot be longer than 30 characters. Try again.')
+            elif "'" in task or '"' in task:
+                print("The characters ' and",'" cannot be used.')
+            else:
+                return "'"+task+"'"                                             # Else return it
+        except:
+            print('An error has occurred with your input. Please try again.')
 
 def inputDeadline():                                                            # Function for asking user input for task deadline
     format = "%Y-%m-%d"                                                         # Date format is yyyy-mm-dd
@@ -95,17 +100,33 @@ def inputWillStart():                                                           
         else:
             print('Invalid input! Try again.')                                  # If input is invalid, ask for input again
 
-def inputCategory(cursor):                                                      # Function to ask user input for category name
-    while(1):                                                                   # Infinite loop
-        categoryName = input("\nWhat category is your task in? Input: ")
-        cursor.execute('SELECT categoryname FROM category')
+def inputCategory(cursor):                                                              # Function to ask user input for category name
+    while(1):
+        categoryName = ''                                                                           # Infinite loop
+        while categoryName == '' or len(categoryName) > 20 or "'" in categoryName or '"' in categoryName:
+            categoryName = input("\nWhat category is your task in? Input: ")
+            if categoryName == '': print('Category cannot be empty!')
+            elif len(categoryName) > 20: print('Category name is too long!')
+            elif "'" in categoryName or '"' in categoryName: print("The characters ' and",'" cannot be used.')
 
-        for category in cursor:                                                 # If category exists,
-            if categoryName in category:                                        # return category name
-                return "'"+categoryName+"'"
-
-        print('Category does not exist!')                                       # Else ask for input again 
-                                                                                # TODO: Ask user if they want to create said category that does not exist
+        try:
+            cursor.execute('SELECT categoryname FROM category')
+            for category in cursor:                                                 # If category exists,
+                if categoryName in category:                                        # return category name
+                    return "'"+categoryName+"'"
+                                                                                    # Else create new category with input name 
+            input1 = input('Category does not exist! Do you want to create a new "'+categoryName+'" category?\nInput (Y/N): ')   
+            if input1 == 'Y' or input1 == 'y':
+                categoryName = "'"+categoryName+"'"
+                dateCreated = 'CURDATE()'
+                cursor.execute('INSERT INTO category VALUES ('+categoryName+', '+dateCreated+')')
+                return categoryName   
+            elif input1 == 'N' or input1 == 'n':
+                break
+            else:
+                print('Invalid input!')
+        except mariadb.Error:
+            print('An error has occurred with your input! Please try again.')                                                           
 
 def addTask(cursor):                                                            # Function for adding a task to the database
     clearTerminal()
@@ -151,13 +172,11 @@ def inputCategoryName(cursor):
                 break         
         
         if exists:
-            print("Category already exist!")   
+            print("Category already exists!")   
         else:
             return "'"+categoryName+"'"                      
 
-def addCategory(cursor):                                                            # Function for adding a task to the database
-    clearTerminal()
-
+def addCategory(cursor):                                                            # Function for adding a category to the database
     categoryName = inputCategoryName(cursor)
     dateCreated = 'CURDATE()'
 
@@ -183,8 +202,11 @@ def deleteCategory(cursor):
 
         if not exists:
             print("Category name does not exist!")
+            break
         else:
             clearTerminal()
+            statement = "DELETE FROM task WHERE categoryname='"+delete+"'"
+            cursor.execute(statement)
             statement = "DELETE FROM category WHERE categoryname = '"+delete+"'"
             print("Executed", statement+";")
             return cursor.execute(statement)
@@ -196,3 +218,38 @@ def viewCategory(cursor):
     for category in cursor:
         print('Category Name:',category[0])
         print('Date Created:',category[1],end='\n-------------------------\n')
+    
+    while(1):
+        input1 = input('\nDo you want to view tasks in a specific category? (Y/N): ')
+
+        if input1 == 'Y' or input1 == 'y':
+            category = input('Input category name: ')
+            cursor.execute('SELECT * from task WHERE categoryname="'+category+'"')
+
+            clearTerminal()
+
+            if len(cursor.fetchall()) == 0:
+                print('Category does not exist.')
+                break
+
+            cursor.execute('SELECT * from task WHERE categoryname="'+category+'"')
+            print('\nTASKS:\n')
+            for task in cursor:
+                print('Task ID:',task[0])
+                print('Description:',task[1])
+                print('Date Added:',task[2])
+                print('Date Started:',task[3])
+                print('Date Finished:',task[4])
+                print('Deadline:',task[5])
+                if task[6] == 0:
+                    print('Status: Not finished')
+                else:
+                    print('Status: Finished')
+                print('Category:',task[7],end='\n-------------------------\n')
+            break
+
+        if input1 == 'N' or input1 == 'n':
+            break
+        
+        else:
+            print('Invalid input!')

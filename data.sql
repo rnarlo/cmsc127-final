@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `category` (
-    categoryname  VARCHAR(10) NOT NULL,
+    categoryname  VARCHAR(20) NOT NULL,
     datecreated   DATE        NOT NULL,
     PRIMARY KEY (`categoryname`)
 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -43,5 +43,5 @@ CREATE TABLE IF NOT EXISTS `user_task` (
         FOREIGN KEY (`taskid`) REFERENCES `task` (`taskid`)
 )ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO category VALUES ('acads', CURDATE());
-INSERT INTO category VALUES ('test', CURDATE());
+INSERT INTO category VALUES ('academics', CURDATE());
+INSERT INTO category VALUES ('chores', CURDATE());

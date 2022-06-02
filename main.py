@@ -1,4 +1,3 @@
-import mysql.connector as mariadb
 import app_functions as app
 
 app.clearTerminal()
@@ -23,6 +22,7 @@ while(1):
         input1 = input('\nIf you are done viewing your tasks, press Enter.\n')
         app.clearTerminal()
     elif input1 == '6':
+        app.clearTerminal()
         app.addCategory(cursor)
         mariadb_connection.commit()
     elif input1 == '8':
@@ -30,9 +30,9 @@ while(1):
         mariadb_connection.commit()
     elif input1 == '9':
         app.viewCategory(cursor) 
-        input1 = input('\nIf you are done viewing the category, press Enter.\n')
+        input1 = input('\nIf you are done viewing, press Enter.\n')
         app.clearTerminal()
-    elif input1 == '11':
+    elif input1 == '10':
         cursor.close()
         print('\nHave a good day!\n')
         exit()
