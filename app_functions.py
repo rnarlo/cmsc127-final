@@ -128,9 +128,12 @@ def inputCategory(cursor):                                                      
         except mariadb.Error:
             print('An error has occurred with your input! Please try again.')                                                           
 
+
+
+
 def addTask(cursor):                                                            # Function for adding a task to the database
     clearTerminal()
-
+    
     taskId = generateTaskId(cursor)
     task = inputTask()
     dateToday = 'CURDATE()'
@@ -139,7 +142,6 @@ def addTask(cursor):                                                            
     categoryName = inputCategory(cursor)
 
     clearTerminal()
-
     statement = "INSERT INTO task VALUES ("+taskId+", "+task+", "+dateToday+", "+dateStarted+", "+"NULL, "+deadline+", "+"0, "+categoryName+")"
     print("Executed", statement+";")
     return cursor.execute(statement)
@@ -253,3 +255,191 @@ def viewCategory(cursor):
         
         else:
             print('Invalid input!')
+
+def inputDateStarted():                                                 #used in editTask()
+    format = "%Y-%m-%d"                                                 #edits the task's date started
+    while(1):                                                                   
+        dateStarted = input("\nDate started: (Leave blank if none, format is yyyy-mm-dd): ")
+
+        if dateStarted == '':                                                      
+            dateStarted = 'NULL'.strip(' ')                                       
+            return dateStarted
+        else:                                                                   
+            try:                                                                
+                res = bool(datetime.strptime(dateStarted, format))
+            except ValueError:
+                res = False
+
+            if not res:                                                         
+                print('Invalid date format!\n')
+            else:                                                               
+                return "'"+dateStarted+"'"
+
+def inputDateFinished():                                                #used in editTask()
+    format = "%Y-%m-%d"                                                 #edits the task's date started
+    while(1):                                                                   
+        dateFinished = input("\nDate Finished: (Leave blank if none, format is yyyy-mm-dd): ")
+
+        if dateFinished == '':                                                      
+            dateFinished = 'NULL'.strip(' ')                                        
+            return dateFinished
+        else:                                                                   
+            try:                                                                
+                res = bool(datetime.strptime(dateFinished, format))
+            except ValueError:
+                res = False
+
+            if not res:                                                        
+                print('Invalid date format!\n')
+            else:                                                               
+                return "'"+dateFinished+"'"
+
+def deleteTask(cursor):
+    clearTerminal()
+    
+    cursor.execute('SELECT * FROM task')                             #displays some of the details of the tasks
+    for task in cursor:
+        print('Task ID:',task[0])
+        print('Description:',task[1])
+        print('Category:',task[7],end='\n-------------------------\n')
+
+    while(1):
+        print("Enter the task ID of the task you want to be deleted.\n")
+        taskID = input("Task ID: ")
+        exists = False
+        
+        cursor.execute('SELECT * FROM task')                        #looks for the entered task id
+        for task in cursor:
+            if taskID in task:
+                exists = True
+                break
+
+        if exists == True:                                          #if the entered task id exists, delete
+            clearTerminal()
+            statement = "DELETE FROM task WHERE taskid = '"+taskID+"'"
+            print("Executed", statement+";")
+            print("Task has been succesfully deleted!")
+            return cursor.execute(statement)
+        else:
+            print("Task ID doesn't exist!")
+
+
+def markTask(cursor):
+    clearTerminal()
+    
+    cursor.execute("SELECT * FROM task")
+    for task in cursor:
+        print('Task ID:',task[0])
+        print('Description:',task[1])
+        print('Date Finished:',task[4])
+        if task[6] == 0:
+            print('Status: Not finished')
+        else:
+            print('Status: Finished')
+        print('Category:',task[7],end='\n-------------------------\n')
+
+    while(1):
+        print("Enter the task ID of the task you want to be marked as DONE.")
+        taskID = input("Task ID: ")
+        exists = False
+        
+        cursor.execute('SELECT * FROM task')                        #looks for the task id
+        for task in cursor:
+            if taskID in task:
+                exists = True
+                break
+
+        if exists == True:                                          #if the task id exists, then update the status of the task to DONE
+            clearTerminal()
+            statement = "UPDATE task SET taskstatus=1 WHERE taskid = '"+taskID+"'"
+            print("Executed", statement+";")
+            print("Task has been successfully marked as DONE!")
+            return cursor.execute(statement)
+
+        else:
+            print("Task ID doesn't exist!")
+    
+
+def editTask(cursor):           
+    clearTerminal()
+    
+    viewTasks(cursor)
+    while(1):
+        print("Enter the task ID of the task you want to be edited.")
+        taskID = input("Task ID: ")
+        exists = False
+        
+        cursor.execute('SELECT * FROM task')                        #looks for the task id
+        for task in cursor:     
+            if taskID in task:
+                exists = True
+                break
+
+        if exists:                                                  #if the task id exists, print the options
+            
+            clearTerminal()
+            print("Which content of the task do you want to be edited?")
+            print("[1] Description")
+            print("[2] Date Started")
+            print("[3] Date Finished")
+            print("[4] Deadline")
+            print("[5] Status")
+
+            choice = input("Enter choice (1-6): ")
+
+            if choice == '1':                                       #edit the task description
+                new_description = input("Enter new task description: ")
+                statement = "UPDATE task SET taskdescription='"+new_description+"'WHERE taskid = '"+taskID+"'"
+                print("Executed", statement+";")
+                print("Task description has been updated!")    
+                return cursor.execute(statement)
+            
+            elif choice == '2':                                     #edit the date started
+                new_date_started = inputDateStarted()
+                statement = "UPDATE task SET datestarted="+new_date_started+" WHERE taskid = '"+taskID+"'"
+                print("Executed", statement+";")
+                print("Date started has been updated!")    
+                return cursor.execute(statement)
+            
+            elif choice == '3':                                     #edit the date finished
+                new_date_finished = inputDateFinished()
+                statement = "UPDATE task SET datefinished= "+new_date_finished+" WHERE taskid = '"+taskID+"'"
+                print("Executed", statement+";")
+                print("Date finished has been updated!")    
+                return cursor.execute(statement)
+
+            elif choice == '4':                                     #edit the deadline
+                new_deadline = inputDeadline()
+                statement = "UPDATE task SET deadline="+new_deadline+" WHERE taskid = '"+taskID+"'"  
+                print("Executed", statement+";")
+                print("Deadline has been updated!")    
+                return cursor.execute(statement)           
+            
+            elif choice == '5':                                     #edit status
+                
+                print("Please choose from the following:")
+                print("[1] Finished")
+                print("[2] Not Yet Finished")
+                
+                input_status = input("Enter status (1-2): ")
+
+                if input_status == '1':
+                    statement = "UPDATE task SET taskstatus=1 WHERE taskid = '"+taskID+"'"
+                    print("Executed", statement+";")
+                    print("Task status has been updated!")      
+                    return cursor.execute(statement)
+                elif input_status == '2':
+                    statement = "UPDATE task SET taskstatus=0 WHERE taskid = '"+taskID+"'"
+                    print("Executed", statement+";")
+                    print("Task status has been updated!")     
+                    return cursor.execute(statement)
+                else:
+                    print("Invalid status!")
+            
+            else:
+                print("Invalid choice!")
+            
+        else:
+            print("Task ID doesn't exist!")
+   
+
