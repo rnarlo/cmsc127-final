@@ -62,6 +62,14 @@ while(1):
         app.addCategory(cursor)
         mariadb_connection.commit()
         category_counter+=1
+    elif input1 == '7':
+        if category_counter>0:
+            app.clearTerminal()
+            app.editCategory(cursor)
+            mariadb_connection.commit()
+        else:
+            app.clearTerminal()
+            print("There are no categories in the list yet!")
     elif input1 == '8':                         #Delete a Category
         if category_counter>0:                         
             app.deleteCategory(cursor)

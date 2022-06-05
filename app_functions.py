@@ -1,6 +1,7 @@
 import os
 import random
 from turtle import clear
+from unicodedata import category
 import mysql.connector as mariadb
 from datetime import datetime
 from datetime import timedelta
@@ -179,15 +180,22 @@ def inputCategoryName(cursor):
         else:
             return "'"+categoryName+"'"                      
 
-def addCategory(cursor):                                                            # Function for adding a category to the database
-    categoryName = inputCategoryName(cursor)
-    dateCreated = 'CURDATE()'
+def addCategory(cursor):
+                                                                # Function for adding a category to the database
+    while(1):
+        try:
+            categoryName = inputCategoryName(cursor)
+            dateCreated = 'CURDATE()'
 
-    clearTerminal()
-
-    statement = "INSERT INTO category VALUES ("+categoryName+", "+dateCreated+")"
-    print("Executed", statement+";")
-    return cursor.execute(statement)
+            if len(categoryName) > 20:
+                print("Category name cannot be longer than 20 characters. Please try again.")
+            else:
+                clearTerminal()
+                statement = "INSERT INTO category VALUES ("+categoryName+", "+dateCreated+")"
+                print("Executed", statement+";")
+                return cursor.execute(statement)
+        except:
+            print("An error has occurred. Please try again.")
 
 def deleteCategory(cursor):
     clearTerminal()
@@ -256,6 +264,41 @@ def viewCategory(cursor):
         
         else:
             print('Invalid input!')
+
+def editCategory(cursor):
+    
+    clearTerminal()
+    print('CATEGORY:\n')
+    cursor.execute('SELECT * from category')
+    for category in cursor:
+        print('Category Name:',category[0])
+        print('Date Created:',category[1],end='\n-------------------------\n')
+
+    while(1):
+        try:
+            print("Enter the name of the category you want to edit.")
+            category_name = input("Category: ")
+            exists = False
+            cursor.execute("SELECT categoryname FROM category")
+            for category in cursor:
+                if category_name in category:
+                    exists = True
+                    break
+            
+            if exists:
+                new_category_name = input("Enter new category name: ")
+
+                if len(new_category_name) > 20:
+                    print("Category name cannot be longer than 20 characters.")
+                
+                else:
+                    statement = "UPDATE category SET categoryname='"+new_category_name+"' WHERE categoryname= '"+category_name+"'"
+                    print("Executed", statement+";")
+                    return cursor.execute(statement)
+            else:
+                print("That category name doesn't exist!")
+        except:
+            print("An error has occurred. Please try again.")
 
 def inputDateStarted():                                                 #used in editTask()
     format = "%Y-%m-%d"                                                 #edits the task's date started
