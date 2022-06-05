@@ -15,6 +15,7 @@ def runSql(file):
 
 app.clearTerminal()
 
+print('You need to login as root in order to initialize the database.')
 password = input('Enter MariaDB root password: ') # Get user input for MariaDB root password.
 
 try:
@@ -43,6 +44,15 @@ for database in cursor:
         else:
             print('\nInvalid input!\n')
             exit()
+
+print('\nYou need to provide a password which you will use every time you use main.py.')
+password = input('Enter password: ')
+
+cursor.execute("DROP USER IF EXISTS 'cmsc127_PJAI'")
+mariadb_connection.commit()
+
+cursor.execute("CREATE USER 'cmsc127_PJAI' IDENTIFIED BY '"+password+"';")           # Create the user for main.py
+cursor.execute("GRANT CREATE, DROP, INSERT, UPDATE, DELETE, SELECT on *.* TO 'cmsc127_PJAI' WITH GRANT OPTION;")
 
 filename = 'data.sql'
 runSql(filename)

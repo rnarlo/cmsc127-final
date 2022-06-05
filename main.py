@@ -15,6 +15,15 @@ print(sep*2)
 task_counter = 0
 category_counter = 0
 
+cursor.execute('SELECT * from task')
+for task in cursor:
+    task_counter += 1
+
+cursor.execute('SELECT * from category')
+for category in cursor:
+    category_counter += 1
+
+
 while(1):
     input1 = app.printMenu()
     
@@ -27,14 +36,16 @@ while(1):
             app.editTask(cursor)
             mariadb_connection.commit()
         else:
-            print("There's no task in the task list yet!")
+            app.clearTerminal()
+            print("There are no tasks in the list yet!")
     elif input1 == '3':                         #Delete a Task
         if task_counter > 0:                         
             app.deleteTask(cursor)                  
             mariadb_connection.commit()
             task_counter -= 1
         else:
-            print("There's no task in the list yet!") 
+            app.clearTerminal()
+            print("There are no tasks in the list yet!") 
     elif input1 == '4':                         #View all Tasks
         app.viewTasks(cursor)
         input1 = input('\nIf you are done viewing your tasks, press Enter.\n')
@@ -44,7 +55,8 @@ while(1):
             app.markTask(cursor)
             mariadb_connection.commit()
         else:
-            print("There's no task in the list yet!")
+            app.clearTerminal()
+            print("There are no tasks in the list yet!")
     elif input1 == '6':                         #Create a New Category
         app.clearTerminal()
         app.addCategory(cursor)
@@ -56,11 +68,16 @@ while(1):
             mariadb_connection.commit()
             category_counter-=1
         else:
-            print("There's no category in the list yet!")
+            app.clearTerminal()
+            print("There are no categories in the list yet!")
     elif input1 == '9':                         #View a Category
-        app.viewCategory(cursor) 
-        input1 = input('\nIf you are done viewing, press Enter.\n')
-        app.clearTerminal()
+        if category_counter>0:
+            app.viewCategory(cursor) 
+            input1 = input('\nIf you are done viewing, press Enter.\n')
+            app.clearTerminal()
+        else:
+            app.clearTerminal()
+            print("There are no categories in the list yet!")
     elif input1 == '10':
         cursor.close()                          #Exit App
         print('\nHave a good day!\n')

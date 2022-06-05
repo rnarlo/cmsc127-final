@@ -1,5 +1,6 @@
 import os
 import random
+from turtle import clear
 import mysql.connector as mariadb
 from datetime import datetime
 from datetime import timedelta
@@ -8,13 +9,13 @@ def clearTerminal():  # Clear the terminal.
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def databaseLogin():  # Function for logging in to MariaDB
-    password = input('Enter MariaDB root password: ') # Get user input for MariaDB root password.
+    password = input('Enter Password: ') # Get user input for MariaDB root password.
 
     try:
-        mariadb_connection = mariadb.connect(user='root', password=password, database='app_data', host='localhost', port='3306')
+        mariadb_connection = mariadb.connect(user='cmsc127_PJAI', password=password, database='app_data', host='localhost', port='3306')
     except mariadb.Error as err:
-        if err.errno == 1698:
-            print("\nIncorrect root password.\n")
+        if err.errno == 1045:
+            print("\nIncorrect password.\n")
             exit()
         else:
             print(err)
@@ -28,7 +29,7 @@ def printMenu():    # Function for printing main menu where the user can choose 
     menuItems = ['Create a New Task', 'Edit an Existing Task', 'Delete a Task', 'View All Tasks', 'Mark a Task As Done', 
                 'Create a New Category', 'Edit a Category', 'Delete a Category', 'View a Category', 'Exit App']
     for item in menuItems:
-        print ('{}.'.format(count),item)
+        print ('[{}]'.format(count),item)
         count += 1
     
     input1 = input('\nInput (1-10): ')
@@ -259,7 +260,7 @@ def viewCategory(cursor):
 def inputDateStarted():                                                 #used in editTask()
     format = "%Y-%m-%d"                                                 #edits the task's date started
     while(1):                                                                   
-        dateStarted = input("\nDate started: (Leave blank if none, format is yyyy-mm-dd): ")
+        dateStarted = input("\nDate Started (Leave blank if none, format is yyyy-mm-dd): ")
 
         if dateStarted == '':                                                      
             dateStarted = 'NULL'.strip(' ')                                       
@@ -362,84 +363,84 @@ def markTask(cursor):
 
 def editTask(cursor):           
     clearTerminal()
+    menuItems = ['Description', 'Date Started', 'Date Finished', 'Deadline', 'Status', 'Category', 'Cancel']
     
     viewTasks(cursor)
-    while(1):
-        print("Enter the task ID of the task you want to be edited.")
-        taskID = input("Task ID: ")
-        exists = False
-        
-        cursor.execute('SELECT * FROM task')                        #looks for the task id
-        for task in cursor:     
-            if taskID in task:
-                exists = True
-                break
+    print("Enter the Task ID of the task you want to edit.")
+    taskId = input("Input: ")
+    exists = False
+    
+    cursor.execute('SELECT * FROM task')                        #looks for the task id
+    for task in cursor:     
+        if taskId in task and taskId != '':
+            exists = True
+            break
 
-        if exists:                                                  #if the task id exists, print the options
-            
-            clearTerminal()
-            print("Which content of the task do you want to be edited?")
-            print("[1] Description")
-            print("[2] Date Started")
-            print("[3] Date Finished")
-            print("[4] Deadline")
-            print("[5] Status")
+    if exists:                                                  #if the task id exists, print the options
+        clearTerminal()
+        while(1):
+            print("Which content of the task do you want to edit?")
+            count = 1
+            for item in menuItems:
+                print ('[{}]'.format(count),item)
+                count += 1
 
             choice = input("Enter choice (1-6): ")
-
+            statement = ''
             if choice == '1':                                       #edit the task description
-                new_description = input("Enter new task description: ")
-                statement = "UPDATE task SET taskdescription='"+new_description+"'WHERE taskid = '"+taskID+"'"
-                print("Executed", statement+";")
-                print("Task description has been updated!")    
-                return cursor.execute(statement)
+                new_description = inputTask()
+                statement = "UPDATE task SET taskdescription="+new_description+" WHERE taskid = '"+taskId+"'" 
             
             elif choice == '2':                                     #edit the date started
                 new_date_started = inputDateStarted()
-                statement = "UPDATE task SET datestarted="+new_date_started+" WHERE taskid = '"+taskID+"'"
-                print("Executed", statement+";")
-                print("Date started has been updated!")    
-                return cursor.execute(statement)
+                statement = "UPDATE task SET datestarted="+new_date_started+" WHERE taskid = '"+taskId+"'"    
             
             elif choice == '3':                                     #edit the date finished
                 new_date_finished = inputDateFinished()
-                statement = "UPDATE task SET datefinished= "+new_date_finished+" WHERE taskid = '"+taskID+"'"
-                print("Executed", statement+";")
-                print("Date finished has been updated!")    
-                return cursor.execute(statement)
+                statement = "UPDATE task SET datefinished="+new_date_finished+" WHERE taskid = '"+taskId+"'"   
 
             elif choice == '4':                                     #edit the deadline
                 new_deadline = inputDeadline()
-                statement = "UPDATE task SET deadline="+new_deadline+" WHERE taskid = '"+taskID+"'"  
-                print("Executed", statement+";")
-                print("Deadline has been updated!")    
-                return cursor.execute(statement)           
+                statement = "UPDATE task SET deadline="+new_deadline+" WHERE taskid = '"+taskId+"'"      
             
-            elif choice == '5':                                     #edit status
-                
-                print("Please choose from the following:")
+            elif choice == '5':                                     #edit status                
+                print("\nPlease choose from the following:")
                 print("[1] Finished")
                 print("[2] Not Yet Finished")
                 
                 input_status = input("Enter status (1-2): ")
 
                 if input_status == '1':
-                    statement = "UPDATE task SET taskstatus=1 WHERE taskid = '"+taskID+"'"
-                    print("Executed", statement+";")
-                    print("Task status has been updated!")      
-                    return cursor.execute(statement)
+                    statement = "UPDATE task SET taskstatus=1 WHERE taskid = '"+taskId+"'"     
                 elif input_status == '2':
-                    statement = "UPDATE task SET taskstatus=0 WHERE taskid = '"+taskID+"'"
-                    print("Executed", statement+";")
-                    print("Task status has been updated!")     
-                    return cursor.execute(statement)
+                    statement = "UPDATE task SET taskstatus=0 WHERE taskid = '"+taskId+"'"    
                 else:
-                    print("Invalid status!")
+                    clearTerminal()
+                    print("Invalid status! Please try again.")
             
+            elif choice == '6':                                     #edit category     
+                newCategory = inputCategory(cursor)
+                statement = "UPDATE task SET categoryname="+newCategory+" WHERE taskid = '"+taskId+"'"
+
+            elif choice == '7':
+                clearTerminal()
+                break
             else:
-                print("Invalid choice!")
+                clearTerminal()
+                print("Invalid choice!\n")
             
+            if statement != '':
+                clearTerminal()
+                print(menuItems[int(choice)-1],'has been updated!')
+                try:
+                    print("Executed", statement+";")
+                    return cursor.execute(statement)
+                except mariadb.Error:
+                    print('An error occurred! Try again.')
+                    break
+
         else:
             print("Task ID doesn't exist!")
+        
    
 
