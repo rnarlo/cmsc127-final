@@ -303,8 +303,13 @@ def editCategory(cursor):
                     return cursor.execute(statement)
             else:
                 print("That category name doesn't exist!")
-                input1 = input("Enter any key to continue. Otherwise (N/n). ")
+                input1 = input("Do you still want to continue? (Y/N): ")
                 if input1 == 'n' or input1 == 'N':
+                    return 0
+                elif input1 == 'y' or input1 == 'Y':
+                    continue
+                else:
+                    print("Invalid input!")
                     return 0
         except:
             print("An error has occurred. Please try again.")
@@ -375,8 +380,13 @@ def deleteTask(cursor):
             return cursor.execute(statement)
         else:
             print("Task ID doesn't exist!")
-            input1 = input("Enter any key to continue. Otherwise (N/n). ")
+            input1 = input("Do you still want to continue? (Y/N): ")
             if input1 == 'n' or input1 == 'N':
+                return 0
+            elif input1 == 'y' or input1 == 'Y':
+                continue
+            else:
+                print("Invalid input!")
                 return 0
 
 
@@ -414,8 +424,13 @@ def markTask(cursor):
 
         else:
             print("Task ID doesn't exist!")
-            input1 = input("Enter any key to continue. Otherwise (N/n). ")
+            input1 = input("Do you still want to continue? (Y/N): ")
             if input1 == 'n' or input1 == 'N':
+                return 0
+            elif input1 == 'y' or input1 == 'Y':
+                continue
+            else:
+                print("Invalid input!")
                 return 0
     
 
