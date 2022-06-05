@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `task` (
     datefinished    DATE        NULL,
     deadline        DATE        NULL,
     taskstatus      BIT(8)      NOT NULL, 
-    categoryname    VARCHAR(20) NOT NULL,
+    categoryname    VARCHAR(20) NULL,
     PRIMARY KEY (`taskid`),
     KEY `task_categoryname_fk` (`categoryname`),
     CONSTRAINT `task_categoryname_fk` 

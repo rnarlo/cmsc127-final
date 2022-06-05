@@ -271,7 +271,7 @@ def viewCategory(cursor):
         else:
             print('Invalid input!')
 
-def editCategory(cursor):
+def editCategory(cursor, mariadb):
     
     clearTerminal()
     print('CATEGORY:\n')
@@ -281,38 +281,56 @@ def editCategory(cursor):
         print('Date Created:',category[1],end=sep)
 
     while(1):
-        try:
-            print("Enter the name of the category you want to edit.")
-            category_name = input("\nCategory: ")
-            exists = False
-            cursor.execute("SELECT categoryname FROM category")
-            for category in cursor:
-                if category_name in category:
-                    exists = True
-                    break
-            
-            if exists:
+        print("\nEnter the name of the category you want to edit.")
+        category_name = input("Category: ")
+        exists = False
+        cursor.execute("SELECT categoryname FROM category")
+        for category in cursor:
+            if category_name in category:
+                exists = True
+                break
+        
+        if exists:
+            try:
                 new_category_name = input("Enter new category name: ")
+
+                cursor.execute("SELECT categoryname FROM category")
+                for category in cursor:
+                    if new_category_name in category:
+                        clearTerminal()
+                        print("\nYou are attempting to edit a category and change its name to an already existing category. You cannot do this.")
+                        return
 
                 if len(new_category_name) > 20:
                     print("Category name cannot be longer than 20 characters.")
                 
                 else:
-                    statement = "UPDATE category SET categoryname='"+new_category_name+"' WHERE categoryname= '"+category_name+"'"
-                    print("Executed", statement+";")
-                    return cursor.execute(statement)
+                    cursor.execute("SELECT dateCreated FROM category WHERE categoryname='"+category_name+"'")
+                    dateCreated = cursor.fetchone()[0]
+                    year = str(dateCreated.year)
+                    month = str(dateCreated.month)
+                    day = str(dateCreated.day)
+
+                    cursor.execute("UPDATE task SET categoryname=NULL WHERE categoryname='"+category_name+"'")
+                    cursor.execute("INSERT INTO category VALUES ('"+new_category_name+"', STR_TO_DATE('"+year+","+month+","+day+"','%Y,%m,%d'))")
+                    cursor.execute("UPDATE task SET categoryname='"+new_category_name+"' WHERE categoryname IS NULL")
+                    cursor.execute("DELETE FROM category WHERE categoryname='"+category_name+"'")
+                    
+                    clearTerminal()
+                    print("Executed successfully!")
+                    return
+            except mariadb.Error:
+                print('An error occurred. Please try again.')
+        else:
+            print("That category name doesn't exist!")
+            input1 = input("Do you still want to continue? (Y/N): ")
+            if input1 == 'n' or input1 == 'N':
+                return 0
+            elif input1 == 'y' or input1 == 'Y':
+                continue
             else:
-                print("That category name doesn't exist!")
-                input1 = input("Do you still want to continue? (Y/N): ")
-                if input1 == 'n' or input1 == 'N':
-                    return 0
-                elif input1 == 'y' or input1 == 'Y':
-                    continue
-                else:
-                    print("Invalid input!")
-                    return 0
-        except:
-            print("An error has occurred. Please try again.")
+                print("Invalid input!")
+                return 0
 
 def inputDateStarted():                                                 #used in editTask()
     format = "%Y-%m-%d"                                                 #edits the task's date started
