@@ -1,4 +1,3 @@
-from unicodedata import category
 import app_functions as app
 
 app.clearTerminal()

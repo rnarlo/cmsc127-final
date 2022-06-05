@@ -1,10 +1,10 @@
 import os
 import random
-from turtle import clear
-from unicodedata import category
 import mysql.connector as mariadb
 from datetime import datetime
 from datetime import timedelta
+
+sep = '\n-------------------------\n'
 
 def clearTerminal():  # Clear the terminal.
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -124,7 +124,7 @@ def inputCategory(cursor):                                                      
                 cursor.execute('INSERT INTO category VALUES ('+categoryName+', '+dateCreated+')')
                 return categoryName   
             elif input1 == 'N' or input1 == 'n':
-                break
+                print("\nInput your category name again.",end="")
             else:
                 print('Invalid input!')
         except mariadb.Error:
@@ -163,7 +163,7 @@ def viewTasks(cursor):
             print('Status: Not finished')
         else:
             print('Status: Finished')
-        print('Category:',task[7],end='\n-------------------------\n')
+        print('Category:',task[7],end=sep)
 
 def inputCategoryName(cursor):
     while(1):                                                                   # Infinite loop
@@ -228,7 +228,7 @@ def viewCategory(cursor):
     cursor.execute('SELECT * from category')
     for category in cursor:
         print('Category Name:',category[0])
-        print('Date Created:',category[1],end='\n-------------------------\n')
+        print('Date Created:',category[1],end=sep)
     
     while(1):
         input1 = input('\nDo you want to view tasks in a specific category? (Y/N): ')
@@ -256,7 +256,7 @@ def viewCategory(cursor):
                     print('Status: Not finished')
                 else:
                     print('Status: Finished')
-                print('Category:',task[7],end='\n-------------------------\n')
+                print('Category:',task[7],end=sep)
             break
 
         if input1 == 'N' or input1 == 'n':
@@ -272,7 +272,7 @@ def editCategory(cursor):
     cursor.execute('SELECT * from category')
     for category in cursor:
         print('Category Name:',category[0])
-        print('Date Created:',category[1],end='\n-------------------------\n')
+        print('Date Created:',category[1],end=sep)
 
     while(1):
         try:
@@ -345,7 +345,7 @@ def deleteTask(cursor):
     for task in cursor:
         print('Task ID:',task[0])
         print('Description:',task[1])
-        print('Category:',task[7],end='\n-------------------------\n')
+        print('Category:',task[7],end=sep)
 
     while(1):
         print("Enter the task ID of the task you want to be deleted.\n")
@@ -380,7 +380,7 @@ def markTask(cursor):
             print('Status: Not finished')
         else:
             print('Status: Finished')
-        print('Category:',task[7],end='\n-------------------------\n')
+        print('Category:',task[7],end=sep)
 
     while(1):
         print("Enter the task ID of the task you want to be marked as DONE.")
@@ -484,6 +484,3 @@ def editTask(cursor):
 
         else:
             print("Task ID doesn't exist!")
-        
-   
-
