@@ -39,9 +39,12 @@ while(1):
             print("There are no tasks in the list yet!")
     elif input1 == '3':                         #Delete a Task
         if task_counter > 0:                         
-            app.deleteTask(cursor)                  
-            mariadb_connection.commit()
-            task_counter -= 1
+            delete = app.deleteTask(cursor)    
+            if delete == 0:
+                continue  
+            else:
+                mariadb_connection.commit()
+                task_counter -= 1
         else:
             app.clearTerminal()
             print("There are no tasks in the list yet!") 
@@ -51,8 +54,11 @@ while(1):
         app.clearTerminal()
     elif input1 == '5':                         #Mark Task as Done
         if task_counter > 0:                          
-            app.markTask(cursor)
-            mariadb_connection.commit()
+            delete = app.markTask(cursor)
+            if delete == 0:
+                continue  
+            else:
+                mariadb_connection.commit()
         else:
             app.clearTerminal()
             print("There are no tasks in the list yet!")
@@ -64,16 +70,22 @@ while(1):
     elif input1 == '7':
         if category_counter>0:
             app.clearTerminal()
-            app.editCategory(cursor)
-            mariadb_connection.commit()
+            delete = app.editCategory(cursor)
+            if delete == 0:
+                continue  
+            else:
+                mariadb_connection.commit()
         else:
             app.clearTerminal()
             print("There are no categories in the list yet!")
     elif input1 == '8':                         #Delete a Category
         if category_counter>0:                         
-            app.deleteCategory(cursor)
-            mariadb_connection.commit()
-            category_counter-=1
+            delete = app.deleteCategory(cursor)
+            if delete == 0:
+                continue  
+            else:
+                mariadb_connection.commit()
+                category_counter-=1
         else:
             app.clearTerminal()
             print("There are no categories in the list yet!")

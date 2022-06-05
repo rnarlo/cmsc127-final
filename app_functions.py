@@ -199,11 +199,17 @@ def addCategory(cursor):
 
 def deleteCategory(cursor):
     clearTerminal()
+    print('CATEGORY:\n')
+    cursor.execute('SELECT * from category')
+    for category in cursor:
+        print('Category Name:',category[0])
+        print('Date Created:',category[1],end=sep)
+
     while(1):
         exists = False
-        delete = input('\nEnter category name to be deleted: ')
+        delete = input('Enter category name to be deleted: ')
 
-        cursor.execute('SELECT * from category')
+        cursor.execute('SELECT categoryname from category')
         for category in cursor:
             if delete in category:
                 exists = True
@@ -213,7 +219,7 @@ def deleteCategory(cursor):
 
         if not exists:
             print("Category name does not exist!")
-            break
+            return 0
         else:
             clearTerminal()
             statement = "DELETE FROM task WHERE categoryname='"+delete+"'"
@@ -277,7 +283,7 @@ def editCategory(cursor):
     while(1):
         try:
             print("Enter the name of the category you want to edit.")
-            category_name = input("Category: ")
+            category_name = input("\nCategory: ")
             exists = False
             cursor.execute("SELECT categoryname FROM category")
             for category in cursor:
@@ -297,6 +303,9 @@ def editCategory(cursor):
                     return cursor.execute(statement)
             else:
                 print("That category name doesn't exist!")
+                input1 = input("Enter any key to continue. Otherwise (N/n). ")
+                if input1 == 'n' or input1 == 'N':
+                    return 0
         except:
             print("An error has occurred. Please try again.")
 
@@ -352,7 +361,7 @@ def deleteTask(cursor):
         taskID = input("Task ID: ")
         exists = False
         
-        cursor.execute('SELECT * FROM task')                        #looks for the entered task id
+        cursor.execute('SELECT taskid FROM task')                        #looks for the entered task id
         for task in cursor:
             if taskID in task:
                 exists = True
@@ -366,6 +375,9 @@ def deleteTask(cursor):
             return cursor.execute(statement)
         else:
             print("Task ID doesn't exist!")
+            input1 = input("Enter any key to continue. Otherwise (N/n). ")
+            if input1 == 'n' or input1 == 'N':
+                return 0
 
 
 def markTask(cursor):
@@ -384,10 +396,10 @@ def markTask(cursor):
 
     while(1):
         print("Enter the task ID of the task you want to be marked as DONE.")
-        taskID = input("Task ID: ")
+        taskID = input("\nTask ID: ")
         exists = False
         
-        cursor.execute('SELECT * FROM task')                        #looks for the task id
+        cursor.execute('SELECT taskid FROM task')                        #looks for the task id
         for task in cursor:
             if taskID in task:
                 exists = True
@@ -402,6 +414,9 @@ def markTask(cursor):
 
         else:
             print("Task ID doesn't exist!")
+            input1 = input("Enter any key to continue. Otherwise (N/n). ")
+            if input1 == 'n' or input1 == 'N':
+                return 0
     
 
 def editTask(cursor):           
@@ -413,7 +428,7 @@ def editTask(cursor):
     taskId = input("Input: ")
     exists = False
     
-    cursor.execute('SELECT * FROM task')                        #looks for the task id
+    cursor.execute('SELECT taskid FROM task')                        #looks for the task id
     for task in cursor:     
         if taskId in task and taskId != '':
             exists = True
@@ -481,6 +496,5 @@ def editTask(cursor):
                 except mariadb.Error:
                     print('An error occurred! Try again.')
                     break
-
-        else:
-            print("Task ID doesn't exist!")
+    else:
+        print("Task ID doesn't exist!")
